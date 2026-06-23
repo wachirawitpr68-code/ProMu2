@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-width=1.0">
+<title>Dungeon Item Sorter</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-color: #1a1a1a;
+  --panel-bg: #2b2b2b;
+  --border-color: #6d6d6d;
+  --text-color: #e0e0e0;
+  --accent-color: #c9a55c;
+  --success-color: #4caf50;
+  --danger-color: #f44336;
+  --ch1-color: #2196f3;
+  --ch2-color: #ff9800;
+  --ch3-color: #f44336;
+  --font-main: 'VT323', monospace;
+  --font-heading: 'Press Start 2P', cursive;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg-color); color: var(--text-color);
+  font-family: var(--font-main); font-size: 20px;
+  min-height: 100vh; display: flex; justify-content: center;
+}
+
+.game-wrapper {
+  width: 100%; max-width: 900px; padding: 20px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.game-header { text-align: center; border-bottom: 4px double var(--border-color); padding-bottom: 20px; }
+.game-header h1 { font-family: var(--font-heading); color: var(--accent-color); font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 0 #000; }
+.subtitle { font-size: 22px; color: #888; }
+
+.dashboard { display: flex; justify-content: space-between; background-color: var(--panel-bg); border: 4px solid var(--border-color); padding: 15px 20px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+.dashboard-item { display: flex; flex-direction: column; align-items: center; }
+.dashboard-item .label { color: var(--accent-color); font-size: 18px; margin-bottom: 5px; }
+.dashboard-item .value { font-size: 28px; font-weight: bold; }
+
+.panel { background-color: var(--panel-bg); border: 4px solid var(--border-color); padding: 30px; min-height: 400px; display: flex; flex-direction: column; align-items: center; position: relative; }
+.panel h2 { font-family: var(--font-heading); font-size: 16px; margin-bottom: 20px; color: var(--accent-color); text-align: center; line-height: 1.5; }
+
+.btn { font-family: var(--font-main); font-size: 20px; padding: 10px 20px; cursor: pointer; background-color: #333; color: #fff; border: 2px solid #555; transition: all 0.2s; text-transform: uppercase; }
+.btn:hover { background-color: #444; border-color: #777; }
+.btn.primary { background-color: var(--accent-color); color: #000; border-color: #fff; }
+.btn.primary:hover { background-color: #e0bc6e; }
+.btn.success { background-color: var(--success-color); border-color: #fff; }
+.btn.danger { background-color: var(--danger-color); border-color: #fff; }
+.btn.massive { font-size: 28px; padding: 15px 30px; margin-top: 20px; }
+.button-group { display: flex; gap: 15px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
+
+.conveyor-container { width: 100%; height: 450px; position: relative; background: repeating-linear-gradient(45deg, #111, #111 20px, #222 20px, #222 40px); border: 4px solid #444; overflow: hidden; }
+.channels-target { position: absolute; right: 0; top: 0; bottom: 0; width: 200px; display: flex; flex-direction: column; border-left: 4px dashed #666; }
+.channel { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; border-bottom: 2px solid #444; background-color: rgba(0,0,0,0.5); font-size: 18px; }
+.channel.target-1 { color: var(--ch1-color); }
+.channel.target-2 { color: var(--ch2-color); border-bottom: 2px solid #444; border-top: 2px solid #444; }
+.channel.target-3 { color: var(--ch3-color); border-bottom: none; }
+.conveyor-track { position: absolute; left: 0; top: 0; bottom: 0; right: 200px; }
+
+.moving-item { position: absolute; left: -150px; opacity: 0; animation: moveConveyor 2s linear forwards; }
+.moving-item.target-ch-1 { top: 10%; }
+.moving-item.target-ch-2 { top: 40%; }
+.moving-item.target-ch-3 { top: 70%; }
+@keyframes moveConveyor { 0% { left: -150px; opacity: 1; } 90% { left: 90%; opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+.item-card { background-color: #000; border: 2px solid var(--accent-color); padding: 15px; width: 200px; display: flex; flex-direction: column; gap: 10px; box-shadow: 2px 2px 0px #555; }
+.item-card.small { width: 180px; padding: 10px; transform: scale(0.9); }
+.item-card .item-header { font-size: 14px; color: #aaa; border-bottom: 1px dotted #555; padding-bottom: 5px; }
+.item-card .item-body { font-size: 20px; text-align: center; }
+.item-card .item-subtype { font-size: 16px; color: #ccc; }
+.item-card .item-condition { margin-top: 10px; font-weight: bold; }
+.condition-perfect { color: var(--success-color); }
+.condition-damaged { color: var(--ch2-color); }
+.condition-heavily-damaged { color: var(--danger-color); }
+.item-card .item-footer { margin-top: 5px; border-top: 1px dotted #555; padding-top: 5px; font-size: 16px; text-align: center; color: var(--accent-color); }
+
+.feedback-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.review-area { display: flex; gap: 40px; align-items: center; background-color: #1a1a1a; padding: 30px; border: 2px dashed var(--accent-color); margin-top: 20px; width: 100%; justify-content: center; }
+.review-controls { display: flex; flex-direction: column; gap: 15px; }
+.review-controls p { font-size: 24px; }
+.review-controls h3 { color: var(--accent-color); }
+.progress { margin-top: 20px; color: #888; }
+
+.game-footer { background-color: var(--panel-bg); border: 4px solid var(--border-color); padding: 20px; }
+.game-footer h3 { font-family: var(--font-heading); font-size: 14px; color: var(--accent-color); margin-bottom: 15px; text-align: center; }
+.memory-map { max-height: 200px; overflow-y: auto; padding: 10px; background-color: #000; border: 2px inset #555; }
+.memory-list { list-style-type: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.memory-list li { font-size: 18px; }
+.memory-key { color: #ccc; }
+.memory-val.ch-1 { color: var(--ch1-color); }
+.memory-val.ch-2 { color: var(--ch2-color); }
+.memory-val.ch-3 { color: var(--ch3-color); }
+.empty-memory { text-align: center; color: #666; font-style: italic; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <header class="game-header">
+    <h1>Dungeon Item Sorter</h1>
+    <p class="subtitle">HITL Machine Learning Simulator</p>
+  </header>
+  
+  <main class="game-main">
+    <div class="dashboard">
+      <div class="dashboard-item"><span class="label">STAGE</span><span class="value" id="ui-stage">1</span></div>
+      <div class="dashboard-item"><span class="label">STAGE SCORE</span><span class="value" id="ui-stage-score">0 / 0</span></div>
+      <div class="dashboard-item"><span class="label">TOTAL SCORE</span><span class="value" id="ui-total-score">0</span></div>
+      <div class="dashboard-item"><span class="label">ACCURACY</span><span class="value" id="ui-accuracy">0%</span></div>
+    </div>
+
+    <div class="game-area">
+      <!-- SUMMARY PHASE -->
+      <div id="screen-summary" class="panel">
+        <h2 id="summary-title">Ready for Stage 1</h2>
+        <p id="summary-desc">Initial Training Stage: The machine knows nothing. It will sort everything into Channel 1. You must correct it.</p>
+        <button class="btn primary massive" onclick="startStage()">Start Conveyor</button>
+      </div>
+
+      <!-- SORTING PHASE -->
+      <div id="screen-sorting" class="panel hidden">
+        <h2>Sorting in progress...</h2>
+        <div class="conveyor-container">
+          <div class="channels-target">
+            <div class="channel target-1">CH 1 (ขายต่อ)</div>
+            <div class="channel target-2">CH 2 (ส่งซ่อม)</div>
+            <div class="channel target-3">CH 3 (คัดทิ้ง)</div>
+          </div>
+          <div class="conveyor-track" id="conveyor-track"></div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK PHASE -->
+      <div id="screen-feedback" class="panel hidden">
+        <div id="feedback-stage2-ask" class="feedback-container hidden">
+          <h2>สายพานคัดแยกเป็นอย่างไร?</h2>
+          <div class="button-group">
+            <button class="btn success" onclick="autoCorrectAll()">คัดแยกได้ถูกต้อง (ทั้งหมด)</button>
+            <button class="btn danger" onclick="startStepByStep()">คัดแยกไม่ถูกต้อง (ตรวจสอบทีละชิ้น)</button>
+          </div>
+        </div>
+
+        <div id="feedback-step" class="feedback-container hidden">
+          <h2>ตรวจสอบผลลัพธ์ (Feedback Loop)</h2>
+          <div class="review-area">
+            <div id="feedback-item-card" class="item-card"></div>
+            
+            <div class="review-controls">
+              <p>ถูกส่งไปที่: <strong id="feedback-predicted">ช่อง 1</strong></p>
+              
+              <div id="feedback-ask-correct">
+                <h3>ของชิ้นนี้ไปถูกช่องไหม?</h3>
+                <div class="button-group">
+                  <button class="btn success" id="btn-correct" onclick="submitFeedback(true)">ถูกต้อง</button>
+                  <button class="btn danger" id="btn-incorrect" onclick="showChannelSelection()">ไม่ถูกต้อง</button>
+                </div>
+              </div>
+
+              <div id="feedback-ask-channel" class="hidden">
+                <h3>ควรจะคัดแยกไปสายพานช่องไหน?</h3>
+                <div class="button-group">
+                  <button class="btn" onclick="submitFeedback(false, 1)">ช่องที่ 1 (ขายต่อ)</button>
+                  <button class="btn" onclick="submitFeedback(false, 2)">ช่องที่ 2 (ส่งซ่อม)</button>
+                  <button class="btn" onclick="submitFeedback(false, 3)">ช่องที่ 3 (คัดทิ้ง)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="progress" id="feedback-progress">Reviewing item 1 of 5</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="game-footer">
+    <h3>Machine Memory Map (Rules Learned)</h3>
+    <div class="memory-map">
+      <ul class="memory-list" id="memory-list"><p class="empty-memory">No rules learned yet.</p></ul>
+    </div>
+  </footer>
+</div>
+
+<script>
+// Logic
+const TYPES = ['Sword', 'Armor'];
+const ARMOR_SUBTYPES = ['Helmet', 'Gloves', 'Boots', 'Chest_Shoulder_Leg_Plate', 'Foot_Armor'];
+const CONDITIONS = ['Perfect', 'Damaged', 'Heavily_Damaged'];
+const ITEMS_PER_STAGE = 5;
+
+let state = {
+  stage: 1,
+  score: 0,
+  totalItemsProcessed: 0,
+  totalScore: 0,
+  memoryMap: {},
+  currentItems: [],
+  feedbackIndex: 0,
+  stageScore: 0
+};
+
+const getMemoryKey = (item) => `${item.type}_${item.subtype}_${item.condition}`;
+const generateId = () => Math.random().toString(36).substring(2, 9);
+
+function updateUI() {
+  document.getElementById('ui-stage').innerText = state.stage;
+  document.getElementById('ui-stage-score').innerText = `${state.stageScore} / ${state.currentItems.length || '-'}`;
+  document.getElementById('ui-total-score').innerText = state.totalScore;
+  const acc = state.totalItemsProcessed === 0 ? 0 : Math.round((state.totalScore / state.totalItemsProcessed) * 100);
+  document.getElementById('ui-accuracy').innerText = acc + '%';
+
+  const memList = document.getElementById('memory-list');
+  const entries = Object.entries(state.memoryMap);
+  if (entries.length === 0) {
+    memList.innerHTML = '<p class="empty-memory">No rules learned yet.</p>';
+  } else {
+    memList.innerHTML = entries.map(([key, ch]) => `<li><span class="memory-key">${key.replace(/_/g, ' ')}</span> ➔ <span class="memory-val ch-${ch}">Channel ${ch}</span></li>`).join('');
+  }
+}
+
+function showScreen(screenId) {
+  document.getElementById('screen-summary').classList.add('hidden');
+  document.getElementById('screen-sorting').classList.add('hidden');
+  document.getElementById('screen-feedback').classList.add('hidden');
+  document.getElementById(screenId).classList.remove('hidden');
+}
+
+function generateItems() {
+  state.currentItems = [];
+  const count = state.stage === 1 ? ITEMS_PER_STAGE : ITEMS_PER_STAGE + Math.floor(state.stage / 2);
+  for (let i = 0; i < count; i++) {
+    const type = TYPES[Math.floor(Math.random() * TYPES.length)];
+    const subtype = type === 'Sword' ? 'None' : ARMOR_SUBTYPES[Math.floor(Math.random() * ARMOR_SUBTYPES.length)];
+    const condition = CONDITIONS[Math.floor(Math.random() * CONDITIONS.length)];
+    const correct_channel = condition === 'Perfect' ? 1 : condition === 'Damaged' ? 2 : 3;
+    
+    let predicted_channel = state.memoryMap[`${type}_${subtype}_${condition}`] || 1;
+    if (state.stage === 1) predicted_channel = 1;
+
+    state.currentItems.push({ id: generateId(), type, subtype, condition, correct_channel, predicted_channel });
+  }
+}
+
+function startStage() {
+  generateItems();
+  state.stageScore = 0;
+  state.feedbackIndex = 0;
+  updateUI();
+  showScreen('screen-sorting');
+  
+  const track = document.getElementById('conveyor-track');
+  track.innerHTML = '';
+  
+  state.currentItems.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = `moving-item target-ch-${item.predicted_channel}`;
+    card.style.animationDelay = `${idx * 1}s`;
+    
+    const condClass = item.condition.replace('_', '-').toLowerCase();
+    card.innerHTML = `
+      <div class="item-card small">
+        <div class="item-header"><span class="item-id">ID: ${item.id}</span></div>
+        <div class="item-body">
+          <div class="item-type">${item.type}</div>
+          ${item.subtype !== 'None' ? `<div class="item-subtype">${item.subtype}</div>` : ''}
+          <div class="item-condition condition-${condClass}">${item.condition.replace('_', ' ')}</div>
+        </div>
+      </div>
+    `;
+    track.appendChild(card);
+  });
+
+  setTimeout(() => {
+    enterFeedbackPhase();
+  }, (state.currentItems.length * 1000) + 2000);
+}
+
+function enterFeedbackPhase() {
+  showScreen('screen-feedback');
+  if (state.stage === 1) {
+    startStepByStep();
+  } else {
+    document.getElementById('feedback-stage2-ask').classList.remove('hidden');
+    document.getElementById('feedback-step').classList.add('hidden');
+  }
+}
+
+function startStepByStep() {
+  document.getElementById('feedback-stage2-ask').classList.add('hidden');
+  document.getElementById('feedback-step').classList.remove('hidden');
+  renderFeedbackItem();
+}
+
+function autoCorrectAll() {
+  state.stageScore = state.currentItems.length;
+  // Technically we should assume the model knew all, so we can reinforce memory here if needed.
+  finishStage();
+}
+
+function renderFeedbackItem() {
+  if (state.feedbackIndex >= state.currentItems.length) {
+    finishStage();
+    return;
+  }
+  
+  document.getElementById('feedback-ask-correct').classList.remove('hidden');
+  document.getElementById('feedback-ask-channel').classList.add('hidden');
+  
+  if(state.stage > 1){
+      document.getElementById('btn-correct').innerText = "ไปถูกแล้ว";
+      document.getElementById('btn-incorrect').innerText = "ยังไปไม่ถูก";
+  } else {
+      document.getElementById('btn-correct').innerText = "ถูกต้อง";
+      document.getElementById('btn-incorrect').innerText = "ไม่ถูกต้อง";
+  }
+
+  const item = state.currentItems[state.feedbackIndex];
+  const condClass = item.condition.replace('_', '-').toLowerCase();
+  
+  document.getElementById('feedback-item-card').innerHTML = `
+    <div class="item-header"><span class="item-id">ID: ${item.id}</span></div>
+    <div class="item-body">
+      <div class="item-type">${item.type}</div>
+      ${item.subtype !== 'None' ? `<div class="item-subtype">${item.subtype}</div>` : ''}
+      <div class="item-condition condition-${condClass}">${item.condition.replace('_', ' ')}</div>
+    </div>
+    <div class="item-footer"><div>Predicted: CH ${item.predicted_channel}</div></div>
+  `;
+  
+  const channelNames = { 1: 'ขายต่อ', 2: 'ส่งซ่อม', 3: 'คัดทิ้ง' };
+  document.getElementById('feedback-predicted').innerText = `ช่อง ${item.predicted_channel} (${channelNames[item.predicted_channel]})`;
+  document.getElementById('feedback-progress').innerText = `Reviewing item ${state.feedbackIndex + 1} of ${state.currentItems.length}`;
+  updateUI();
+}
+
+function showChannelSelection() {
+  document.getElementById('feedback-ask-correct').classList.add('hidden');
+  document.getElementById('feedback-ask-channel').classList.remove('hidden');
+}
+
+function submitFeedback(isCorrect, selectedChannel) {
+  const item = state.currentItems[state.feedbackIndex];
+  if (isCorrect) {
+    state.stageScore += 1;
+    state.memoryMap[getMemoryKey(item)] = item.correct_channel;
+  } else {
+    state.memoryMap[getMemoryKey(item)] = selectedChannel;
+  }
+  state.feedbackIndex += 1;
+  renderFeedbackItem();
+}
+
+function finishStage() {
+  state.totalScore += state.stageScore;
+  state.totalItemsProcessed += state.currentItems.length;
+  state.stage += 1;
+  updateUI();
+  
+  document.getElementById('summary-title').innerText = `Ready for Stage ${state.stage}`;
+  document.getElementById('summary-desc').innerText = "Testing & Active Learning Stage: The machine will use what it learned to sort the items.";
+  showScreen('screen-summary');
+}
+</script>
+</body>
+</html>
