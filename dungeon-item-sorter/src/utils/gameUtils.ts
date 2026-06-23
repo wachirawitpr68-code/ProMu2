@@ -1,4 +1,4 @@
-import { Item, ItemType, SubType, Condition } from '../models/types';
+import type { Item, ItemType, SubType, Condition } from '../models/types';
 
 export const generateId = () => Math.random().toString(36).substring(2, 9);
 

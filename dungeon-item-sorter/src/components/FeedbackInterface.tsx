@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Item, GameState } from '../models/types';
+import type { Item, GameState } from '../models/types';
 import { ItemCard } from './ItemCard';
 
 interface FeedbackInterfaceProps {

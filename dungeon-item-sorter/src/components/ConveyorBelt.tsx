@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Item } from '../models/types';
+import type { Item } from '../models/types';
 import { ItemCard } from './ItemCard';
 
 interface ConveyorBeltProps {

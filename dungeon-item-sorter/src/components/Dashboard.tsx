@@ -1,5 +1,5 @@
 import React from 'react';
-import { GameState } from '../models/types';
+import type { GameState } from '../models/types';
 
 interface DashboardProps {
   state: GameState;

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Item, GameState } from '../models/types';
+import type { Item, GameState } from '../models/types';
 import { generateItems, getMemoryKey } from '../utils/gameUtils';
 
 const ITEMS_PER_STAGE_BASE = 5;

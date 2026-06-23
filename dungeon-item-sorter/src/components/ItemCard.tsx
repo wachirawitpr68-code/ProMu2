@@ -1,5 +1,5 @@
 import React from 'react';
-import { Item } from '../models/types';
+import type { Item } from '../models/types';
 
 interface ItemCardProps {
   item: Item;
