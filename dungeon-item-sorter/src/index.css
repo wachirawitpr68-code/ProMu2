@@ -33,7 +33,7 @@ body {
 
 .game-wrapper {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -217,9 +217,10 @@ body {
 .moving-item.target-ch-3 { top: 70%; }
 
 @keyframes moveConveyor {
-  0% { left: -150px; opacity: 1; }
-  90% { left: 90%; opacity: 1; }
-  100% { left: 100%; opacity: 0; }
+  0% { left: -250px; transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+  75% { left: calc(100% - 250px); transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+  85% { left: calc(100% - 120px); transform: scale(0.8) translateY(20px) rotate(15deg); opacity: 1; }
+  100% { left: calc(100% - 120px); transform: scale(0.3) translateY(120px) rotate(60deg); opacity: 0; }
 }
 
 /* Item Card */
@@ -258,12 +259,37 @@ body {
 }
 
 .item-card .item-condition {
-  margin-top: 10px;
+  margin-top: 5px;
   font-weight: bold;
 }
 .condition-perfect { color: var(--success-color); }
 .condition-damaged { color: var(--ch2-color); }
 .condition-heavily_damaged { color: var(--danger-color); }
+
+.item-graphic {
+  font-size: 50px;
+  text-align: center;
+  margin: 5px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+}
+
+.item-graphic.condition-perfect {
+  filter: drop-shadow(0 0 10px rgba(201, 165, 92, 0.8));
+}
+
+.item-graphic.condition-damaged {
+  filter: sepia(0.6) brightness(0.8);
+  transform: rotate(-10deg);
+}
+
+.item-graphic.condition-heavily_damaged {
+  filter: grayscale(0.8) brightness(0.4) contrast(1.2);
+  transform: rotate(25deg);
+  clip-path: polygon(0 0, 70% 0, 100% 30%, 80% 50%, 100% 80%, 60% 100%, 0 100%, 20% 50%);
+}
 
 .item-card .item-footer {
   margin-top: 5px;
