@@ -29,6 +29,14 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .game-wrapper {
@@ -158,7 +166,7 @@ body {
 /* Conveyor */
 .conveyor-container {
   width: 100%;
-  height: 450px;
+  height: 600px;
   position: relative;
   background: repeating-linear-gradient(
     45deg,
@@ -176,7 +184,7 @@ body {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 200px;
+  width: 280px;
   display: flex;
   flex-direction: column;
   border-left: 4px dashed #666;
@@ -202,7 +210,7 @@ body {
   left: 0;
   top: 0;
   bottom: 0;
-  right: 200px;
+  right: 280px;
 }
 
 .moving-item {
@@ -228,7 +236,7 @@ body {
   background-color: #000;
   border: 2px solid var(--accent-color);
   padding: 15px;
-  width: 200px;
+  width: 280px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -236,7 +244,7 @@ body {
 }
 
 .item-card.small {
-  width: 180px;
+  width: 240px;
   padding: 10px;
   transform: scale(0.9);
 }
@@ -267,13 +275,12 @@ body {
 .condition-heavily_damaged { color: var(--danger-color); }
 
 .item-graphic {
-  font-size: 50px;
   text-align: center;
   margin: 5px 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60px;
+  height: 120px;
 }
 
 .item-graphic.condition-perfect {

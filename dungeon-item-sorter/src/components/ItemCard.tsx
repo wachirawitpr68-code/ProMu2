@@ -7,18 +7,18 @@ interface ItemCardProps {
 }
 
 const getItemIcon = (type: string, subtype: string) => {
-  if (type === 'Sword') return '🗡️';
+  if (type === 'Sword') return '/assets/sword.png';
   if (type === 'Armor') {
     switch (subtype) {
-      case 'Helmet': return '🪖';
-      case 'Gloves': return '🧤';
+      case 'Helmet': return '/assets/helmet.png';
+      case 'Gloves': return '/assets/gloves.png';
       case 'Boots':
-      case 'Foot_Armor': return '🥾';
-      case 'Chest_Shoulder_Leg_Plate': return '👕';
-      default: return '🛡️';
+      case 'Foot_Armor': return '/assets/boots.png';
+      case 'Chest_Shoulder_Leg_Plate': return '/assets/chest.png';
+      default: return '/assets/chest.png';
     }
   }
-  return '📦';
+  return '/assets/sword.png';
 };
 
 export const ItemCard: React.FC<ItemCardProps> = ({ item, small }) => {
@@ -29,7 +29,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, small }) => {
       </div>
       <div className="item-body">
         <div className={`item-graphic condition-${item.condition.toLowerCase()}`}>
-          {getItemIcon(item.type, item.subtype)}
+          <img src={getItemIcon(item.type, item.subtype)} alt={item.subtype !== 'None' ? item.subtype : item.type} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div className="item-type">{item.type}</div>
         {item.subtype !== 'None' && <div className="item-subtype">{item.subtype.replace(/_/g, ' ')}</div>}
