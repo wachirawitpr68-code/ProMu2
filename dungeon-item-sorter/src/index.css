@@ -317,14 +317,15 @@ body {
 
 .review-area {
   display: flex;
-  gap: 40px;
+  gap: 60px;
   align-items: center;
   background-color: #1a1a1a;
-  padding: 30px;
+  padding: 50px;
   border: 2px dashed var(--accent-color);
   margin-top: 20px;
   width: 100%;
   justify-content: center;
+  min-height: 500px;
 }
 
 .review-controls {
